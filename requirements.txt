@@ -1,0 +1,10 @@
+streamlit
+requests
+beautifulsoup4
+openai
+pydantic
+graphviz
+pytest
+python-dotenv
+fastapi
+uvicorn
