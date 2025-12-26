@@ -55,7 +55,19 @@ docker run -p 8501:8501 -p 8000:8000 --env-file .env pulse-extractor
 - **UI**: http://localhost:8501
 - **API Docs**: http://localhost:8000/docs
 
-## 📡 API Usage
+## � CLI Usage
+
+You can run the extractor directly from the command line:
+
+```bash
+# Basic usage
+python module_extractor.py --urls https://help.instagram.com
+
+# Advanced usage
+python module_extractor.py --urls https://help.instagram.com https://support.stripe.com --depth 2 --output my_report.json
+```
+
+## �📡 API Usage
 
 **Endpoint:** `POST /extract`
 

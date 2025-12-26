@@ -32,11 +32,15 @@ class Extractor:
         You are an expert technical writer and information architect.
         Analyze the following documentation content and extract the key modules and submodules.
         
+        CRITICAL INSTRUCTION:
+        - Base your extraction ONLY on the provided text content. Do not use outside knowledge.
+        - If the content is insufficient to identify modules, return an empty list.
+
         STRICT OUTPUT FORMAT REQUIRED:
         You must return a JSON object with a single key "modules" containing an array of objects.
         Each object must have exactly these keys:
         - "module": The name of the module.
-        - "Description": A detailed description of the module.
+        - "Description": A detailed description of the module based ONLY on the text.
         - "Submodules": A dictionary where keys are submodule names and values are their detailed descriptions.
         - "confidence_score": A float between 0.0 and 1.0 indicating your confidence in this extraction.
 
