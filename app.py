@@ -169,6 +169,9 @@ if process_btn:
                                 st.markdown(f"- **{sub}**: {desc}")
                 
                 with tab3:
+                    st.markdown("### 👁️ Output Preview")
+                    st.code(json.dumps(modules, indent=2), language='json')
+
                     st.markdown("### Download Reports")
                     
                     # JSON Download
