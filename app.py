@@ -65,6 +65,22 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### About")
     st.markdown("This tool uses AI to analyze documentation and extract a structured hierarchy of modules.")
+    
+    st.markdown("---")
+    st.markdown("### 📖 User Manual")
+    with st.expander("How to use"):
+        st.markdown("""
+        1. **Enter URLs**: Paste documentation URLs in the main text area (one per line).
+        2. **Configure**: 
+           - Select AI Model (GPT-4o recommended).
+           - Set Crawl Depth (1 = just the page, 2 = follow links once).
+        3. **Start**: Click 'Start Extraction'.
+        4. **Analyze**: View the extracted modules, hierarchy graph, and statistics.
+        5. **Download**: Get the full report in JSON or Markdown format.
+        """)
+    
+    st.markdown("---")
+    st.info("⚠️ **Note**: Ensure you have permission to crawl the target sites. API costs apply.")
 
 # Main input area
 col1, col2 = st.columns([3, 1])
@@ -123,8 +139,16 @@ if process_btn:
                     avg_conf = sum(m.get('confidence_score', 0) for m in modules) / len(modules) if modules else 0
                     st.metric("Avg Confidence", f"{avg_conf:.2%}")
 
+                # Charts
+                st.markdown("### 📈 Analytics")
+                chart_data = {
+                    "Module": [m.get('module', 'Unknown') for m in modules],
+                    "Submodules Count": [len(m.get('Submodules', {})) for m in modules]
+                }
+                st.bar_chart(chart_data, x="Module", y="Submodules Count", color="#4F8BF9")
+
                 # Tabs for different views
-                tab1, tab2, tab3 = st.tabs(["📊 Visualization", "📑 Structured View", "💾 JSON Output"])
+                tab1, tab2, tab3 = st.tabs(["📊 Visualization", "📑 Structured View", "💾 Export"])
                 
                 with tab1:
                     st.markdown("### Module Hierarchy Graph")
@@ -145,12 +169,42 @@ if process_btn:
                                 st.markdown(f"- **{sub}**: {desc}")
                 
                 with tab3:
-                    st.json(modules)
+                    st.markdown("### Download Reports")
+                    
+                    # JSON Download
+                    json_data = json.dumps(modules, indent=2)
                     st.download_button(
-                        label="Download JSON Report",
-                        data=json.dumps(modules, indent=2),
+                        label="📥 Download JSON Data",
+                        data=json_data,
                         file_name="pulse_modules.json",
                         mime="application/json"
+                    )
+                    
+                    # Markdown Report Generation
+                    def generate_markdown_report(modules):
+                        report = f"# Pulse Module Extraction Report\n\n"
+                        report += f"**Date:** {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+                        report += f"## Summary\n"
+                        report += f"- **Total Modules:** {len(modules)}\n"
+                        report += f"- **Total Submodules:** {sum(len(m.get('Submodules', {})) for m in modules)}\n\n"
+                        report += "## Detailed Breakdown\n\n"
+                        
+                        for mod in modules:
+                            report += f"### 📦 {mod.get('module', 'Unknown')}\n"
+                            report += f"**Description:** {mod.get('Description', 'N/A')}\n\n"
+                            report += f"**Confidence Score:** {mod.get('confidence_score', 'N/A')}\n\n"
+                            report += "**Submodules:**\n"
+                            for sub, desc in mod.get('Submodules', {}).items():
+                                report += f"- **{sub}**: {desc}\n"
+                            report += "\n---\n\n"
+                        return report
+
+                    md_report = generate_markdown_report(modules)
+                    st.download_button(
+                        label="📄 Download Full Report (Markdown)",
+                        data=md_report,
+                        file_name="pulse_report.md",
+                        mime="text/markdown"
                     )
             else:
                 st.error("Failed to extract modules. The AI model might have returned an empty result.")
